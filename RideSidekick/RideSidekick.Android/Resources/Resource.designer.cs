@@ -4331,6 +4331,9 @@ namespace RideSidekick.Droid
 			// aapt resource value: 0x7f090010
 			public const int common_signin_button_text_long = 2131296272;
 			
+			// aapt resource value: 0x7f09004f
+			public const int google_maps_api_key = 2131296335;
+			
 			// aapt resource value: 0x7f090011
 			public const int mr_button_content_description = 2131296273;
 			
