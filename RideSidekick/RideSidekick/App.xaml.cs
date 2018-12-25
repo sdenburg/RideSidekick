@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RideSidekick.Pages;
+using System;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
@@ -11,7 +12,7 @@ namespace RideSidekick
         {
             InitializeComponent();
 
-            MainPage = new MainPage();
+            MainPage = new MapPage();
         }
 
         protected override void OnStart()
