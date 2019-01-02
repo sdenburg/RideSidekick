@@ -1,5 +1,6 @@
 # Api Keys
 RideSidekick/RideSidekick.Android/Resources/values/apiKeys.xml
+RideSidekick/RideSidekick/Configuration/UberConfiguration.json
 
 # Created by https://www.gitignore.io/api/visualstudio,xamarinstudio
 # Edit at https://www.gitignore.io/?templates=visualstudio,xamarinstudio

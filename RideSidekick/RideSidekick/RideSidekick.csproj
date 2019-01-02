@@ -10,6 +10,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Configuration\UberConfiguration.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Configuration\UberConfiguration.json" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
     <PackageReference Include="Rideshare.Uber.Sdk" Version="0.1.0" />
     <PackageReference Include="Xamarin.Essentials" Version="1.0.0" />
@@ -18,13 +26,16 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="Pages\MapPage.xaml.cs">
-      <DependentUpon>MapPage.xaml</DependentUpon>
+    <Compile Update="Pages\RideSearchPage.xaml.cs">
+      <DependentUpon>RideSearchPage.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Update="Pages\MapPage.xaml">
+    <EmbeddedResource Update="Pages\RideSearchPage.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Pages\RideResultsPage.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
   </ItemGroup>

@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:maps="clr-namespace:Xamarin.Forms.Maps;assembly=Xamarin.Forms.Maps"
+             x:Class="RideSidekick.Pages.RideSearchPage">
+    <ContentPage.Content>
+        <StackLayout>
+            <Entry Keyboard="Text" x:Name="DestinationAddressInput" x:FieldModifier="public" Placeholder="Destination address"></Entry>
+            <Entry Keyboard="Numeric" x:Name="StartWalkDistanceInput" x:FieldModifier="public" Placeholder="Start distance" Text="0"></Entry>
+            <Entry Keyboard="Numeric" x:Name="EndWalkDistanceInput" x:FieldModifier="public" Placeholder="End ditance" Text="0.03"></Entry>
+            <Button x:Name="SubmitButton" Text="Submit" Clicked="OnSubmit"></Button>
+            <maps:Map x:Name="Map"
+                      x:FieldModifier="public" 
+                      IsShowingUser="True"/>
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>
