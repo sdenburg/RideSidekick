@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -8,6 +9,7 @@ using Newtonsoft.Json;
 using Rideshare.Uber.Sdk;
 using Rideshare.Uber.Sdk.Models;
 using RideSidekick.Configuration;
+using RideSidekick.Models;
 using Xamarin.Essentials;
 using Xamarin.Forms;
 using Xamarin.Forms.Maps;
@@ -19,20 +21,9 @@ namespace RideSidekick.Pages
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class RideSearchPage : ContentPage
     {
-        public string UberServerToken { get; set;
-        }
         public RideSearchPage()
         {
             InitializeComponent();
-
-            var assembly = IntrospectionExtensions.GetTypeInfo(typeof(RideResultsPage)).Assembly;
-            Stream stream = assembly.GetManifestResourceStream("RideSidekick.Configuration.UberConfiguration.json");
-            using (var reader = new StreamReader(stream))
-            {
-                string text = reader.ReadToEnd();
-                var uberConfiguration = JsonConvert.DeserializeObject<UberConfiguration>(text);
-                this.UberServerToken = uberConfiguration.ServerToken;
-            }
 
             var defaultMapCenter = new Position(40, -95);
             var defaultMapSpan = MapSpan.FromCenterAndRadius(defaultMapCenter, Distance.FromMiles(100));
@@ -52,9 +43,9 @@ namespace RideSidekick.Pages
                 var geocoder = new Geocoder();
                 var destinationPosition = (await geocoder.GetPositionsForAddressAsync(this.DestinationAddressInput.Text)).FirstOrDefault();
                 var endLocation = new Location(destinationPosition.Latitude, destinationPosition.Longitude);
-                var prices = await this.GetUberPrices(currentLocation, endLocation, startWalkDistance, endWalkDistance);
+                var rides = await this.GetUberRides(currentLocation, endLocation, startWalkDistance, endWalkDistance);
 
-                await Navigation.PushAsync(new RideResultsPage(prices));
+                await Navigation.PushAsync(new RideResultsPage(rides));
             }
             else
             {
@@ -64,26 +55,26 @@ namespace RideSidekick.Pages
             this.SubmitButton.IsEnabled = true;
         }
 
-        private async Task<Dictionary<Route, PriceEstimate>> GetUberPrices(Location startLocation, Location endLocation, double startWalkDistance, double endWalkDistance)
+        private async Task<IEnumerable<UberRide>> GetUberRides(Location startLocation, Location endLocation, double startWalkDistance, double endWalkDistance)
         {
-            var uberClient = new ServerAuthenticatedUberRiderService(this.UberServerToken);
+            var uberClient = new ServerAuthenticatedUberRiderService(UberConfigurationManager.Configuration.ServerToken);
 
             double queryDensity = 0.01;
             string uberType = "Pool";
 
             var requests = new List<Task>();
-            var prices = new Dictionary<Route, PriceEstimate>();
-            for (double tempStartLatitude = startLocation.Latitude - startWalkDistance; tempStartLatitude <= startLocation.Latitude + startWalkDistance; tempStartLatitude += queryDensity)
+            var rides = new List<UberRide>();
+            for (double pickupLatitude = startLocation.Latitude - startWalkDistance; pickupLatitude <= startLocation.Latitude + startWalkDistance; pickupLatitude += queryDensity)
             {
-                for (double tempStartLongitude = startLocation.Longitude - startWalkDistance; tempStartLongitude <= startLocation.Longitude + startWalkDistance; tempStartLongitude += queryDensity)
+                for (double pickupLongitude = startLocation.Longitude - startWalkDistance; pickupLongitude <= startLocation.Longitude + startWalkDistance; pickupLongitude += queryDensity)
                 {
-                    for (double tempEndLatitude = endLocation.Latitude - endWalkDistance; tempEndLatitude <= endLocation.Latitude + endWalkDistance; tempEndLatitude += queryDensity)
+                    for (double dropoffLatitude = endLocation.Latitude - endWalkDistance; dropoffLatitude <= endLocation.Latitude + endWalkDistance; dropoffLatitude += queryDensity)
                     {
-                        for (double tempEndLongitude = endLocation.Longitude - endWalkDistance; tempEndLongitude <= endLocation.Longitude + endWalkDistance; tempEndLongitude += queryDensity)
+                        for (double dropoffLongitude = endLocation.Longitude - endWalkDistance; dropoffLongitude <= endLocation.Longitude + endWalkDistance; dropoffLongitude += queryDensity)
                         {
-                            var getPriceEstimateTask = uberClient.GetPriceEstimateAsync((float)tempStartLatitude, (float)tempStartLongitude, (float)tempEndLatitude, (float)tempEndLongitude);
+                            var getPriceEstimateTask = uberClient.GetPriceEstimateAsync((float)pickupLatitude, (float)pickupLongitude, (float)dropoffLatitude, (float)dropoffLongitude);
 
-                            Console.WriteLine($"Uber price estimate request made from {tempStartLatitude}, {tempStartLongitude} to {tempEndLatitude}, {tempEndLongitude}");
+                            Console.WriteLine($"Uber price estimate request made from {pickupLatitude}, {pickupLongitude} to {dropoffLatitude}, {dropoffLongitude}");
                             var handlePriceEstimateTask = getPriceEstimateTask.ContinueWith((response) =>
                             {
                                 var priceEstimate = response.Result
@@ -98,15 +89,19 @@ namespace RideSidekick.Pages
                                     return;
                                 }
 
-                                var tempRoute = new Route
+                                var uberRide = new UberRide()
                                 {
-                                    Pickup = new Location(tempStartLatitude, tempStartLongitude),
-                                    Dropoff = new Location(tempEndLatitude, tempEndLongitude),
-                                    Current = startLocation,
-                                    Destination = endLocation
+                                    Route = new Route
+                                    {
+                                        Pickup = new Location(pickupLatitude, pickupLongitude),
+                                        Dropoff = new Location(dropoffLatitude, dropoffLongitude),
+                                        Start = startLocation,
+                                        Destination = endLocation
+                                    },
+                                    PriceEstimate = priceEstimate
                                 };
 
-                                prices.Add(tempRoute, priceEstimate);
+                                rides.Add(uberRide);
 
                                 // this.DrawRouteOnMap(this.Map, tempRoute);
                                 Console.WriteLine("Uber request completed and handled");
@@ -120,7 +115,7 @@ namespace RideSidekick.Pages
             }
 
             await Task.WhenAll(requests);
-            return prices;
+            return rides;
         }
 
         private void DrawRouteOnMap(Map map, Route route)
@@ -158,28 +153,6 @@ namespace RideSidekick.Pages
             {
                 // Unable to get location
                 return;
-            }
-        }
-
-        public class Route : IComparable<Route>
-        {
-            public Location Current { get; set; }
-            public Location Pickup { get; set; }
-            public Location Destination{ get; set; }
-            public Location Dropoff { get; set; }
-
-            public int CompareTo(Route other)
-            {
-                var thisDistanceToPickup = Location.CalculateDistance(this.Current, this.Pickup, DistanceUnits.Miles);
-                var otherDistanceToPickup = Location.CalculateDistance(other.Current, other.Pickup, DistanceUnits.Miles);
-
-                var thisDistanceToDropoff = Location.CalculateDistance(this.Current, this.Pickup, DistanceUnits.Miles);
-                var otherDistanceToDropoff = Location.CalculateDistance(other.Current, other.Pickup, DistanceUnits.Miles);
-
-                var thisTotalWalking = thisDistanceToPickup + thisDistanceToDropoff;
-                var otherTotalWalking = otherDistanceToPickup + otherDistanceToDropoff;
-
-                return thisTotalWalking.CompareTo(otherTotalWalking);
             }
         }
     }

@@ -11,9 +11,9 @@
       <DataTemplate>
         <ViewCell>
           <StackLayout>
-            <Label Text="{Binding Value.Estimate}" 
+            <Label Text="{Binding PriceEstimate}" 
                    Style="{DynamicResource ListItemTextStyle}" />
-            <Label Text="{Binding Key.StartLocation.Latitude}" 
+            <Label Text="{Binding Route}" 
                    Style="{DynamicResource ListItemDetailTextStyle}"/>
           </StackLayout>
         </ViewCell>

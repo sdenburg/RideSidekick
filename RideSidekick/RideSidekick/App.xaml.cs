@@ -1,4 +1,5 @@
-﻿using RideSidekick.Pages;
+﻿using RideSidekick.Configuration;
+using RideSidekick.Pages;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
@@ -11,6 +12,7 @@ namespace RideSidekick
         {
             InitializeComponent();
 
+            UberConfigurationManager.LoadConfiguration();
             MainPage = new NavigationPage(new RideSearchPage());
         }
 

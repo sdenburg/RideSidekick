@@ -2,29 +2,33 @@
 using System.Collections.ObjectModel;
 using System.Linq;
 using Rideshare.Uber.Sdk.Models;
+using RideSidekick.Models;
 using Xamarin.Forms;
 using Xamarin.Forms.Maps;
 using Xamarin.Forms.Xaml;
-using static RideSidekick.Pages.RideSearchPage;
 
 namespace RideSidekick.Pages
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class RideResultsPage : ContentPage
     {
-        public ObservableCollection<KeyValuePair<Route, PriceEstimate>> Items { get; set; }
+        protected ObservableCollection<UberRow> Items { get; set; }
 
-        public RideResultsPage(Dictionary<Route, PriceEstimate> prices)
+        public RideResultsPage(IEnumerable<UberRide> rides)
         {
             InitializeComponent();
+            
+            var orderedRows = rides.OrderBy(p => p.PriceEstimate.HighEstimate)
+                                    .ThenBy(p => p.Route)
+                                    .Select(p => new UberRow
+                                    {
+                                        PriceEstimate = p.PriceEstimate.Estimate,
+                                        Route = p.Route.ToString()
+                                    })
+                                    .ToList();
 
-            var geocoder = new Geocoder();
-            var orderedPrices = prices.OrderBy(p => p.Value.HighEstimate)
-                                      .ThenBy(p => p.Key)
-                                      .ToList();
-
-            this.Items = new ObservableCollection<KeyValuePair<Route, PriceEstimate>>(orderedPrices);
-			RideResultsList.ItemsSource = orderedPrices;
+            this.Items = new ObservableCollection<UberRow>(orderedRows);
+			RideResultsList.ItemsSource = orderedRows;
         }
 
         async void Handle_ItemTapped(object sender, ItemTappedEventArgs e)
@@ -36,6 +40,12 @@ namespace RideSidekick.Pages
 
             //Deselect Item
             ((ListView)sender).SelectedItem = null;
+        }
+
+        protected class UberRow
+        {
+            public string PriceEstimate { get; set; }
+            public string Route { get; set; }
         }
     }
 }

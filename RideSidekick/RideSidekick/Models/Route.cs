@@ -1,0 +1,32 @@
+﻿using System;
+using Xamarin.Essentials;
+
+namespace RideSidekick.Models
+{
+    public class Route : IComparable<Route>
+    {
+        public Location Start { get; set; }
+        public Location Pickup { get; set; }
+        public Location Destination { get; set; }
+        public Location Dropoff { get; set; }
+
+        public int CompareTo(Route other)
+        {
+            var thisDistanceToPickup = Location.CalculateDistance(this.Start, this.Pickup, DistanceUnits.Miles);
+            var otherDistanceToPickup = Location.CalculateDistance(other.Start, other.Pickup, DistanceUnits.Miles);
+
+            var thisDistanceToDropoff = Location.CalculateDistance(this.Start, this.Pickup, DistanceUnits.Miles);
+            var otherDistanceToDropoff = Location.CalculateDistance(other.Start, other.Pickup, DistanceUnits.Miles);
+
+            var thisTotalWalking = thisDistanceToPickup + thisDistanceToDropoff;
+            var otherTotalWalking = otherDistanceToPickup + otherDistanceToDropoff;
+
+            return thisTotalWalking.CompareTo(otherTotalWalking);
+        }
+
+        public override string ToString()
+        {
+            return $"({this.Pickup.Latitude}, {this.Pickup.Longitude}) to ({this.Dropoff.Latitude}, {this.Dropoff.Longitude})";
+        }
+    }
+}
