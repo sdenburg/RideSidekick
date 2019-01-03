@@ -60,7 +60,6 @@ namespace RideSidekick.Pages
             var uberClient = new ServerAuthenticatedUberRiderService(UberConfigurationManager.Configuration.ServerToken);
 
             double queryDensity = 0.01;
-            string uberType = "Pool";
 
             var requests = new List<Task>();
             var rides = new List<UberRide>();
@@ -75,37 +74,16 @@ namespace RideSidekick.Pages
                             var getPriceEstimateTask = uberClient.GetPriceEstimateAsync((float)pickupLatitude, (float)pickupLongitude, (float)dropoffLatitude, (float)dropoffLongitude);
 
                             Console.WriteLine($"Uber price estimate request made from {pickupLatitude}, {pickupLongitude} to {dropoffLatitude}, {dropoffLongitude}");
-                            var handlePriceEstimateTask = getPriceEstimateTask.ContinueWith((response) =>
+
+                            var route = new Route
                             {
-                                var priceEstimate = response.Result
-                                        .Data
-                                        .PriceEstimates
-                                        .Where(p => p.DisplayName == uberType)
-                                        .SingleOrDefault();
+                                Pickup = new Location(pickupLatitude, pickupLongitude),
+                                Dropoff = new Location(dropoffLatitude, dropoffLongitude),
+                                Start = startLocation,
+                                Destination = endLocation
+                            };
 
-                                if (priceEstimate == null)
-                                {
-                                    Console.WriteLine("Error getting price estimate");
-                                    return;
-                                }
-
-                                var uberRide = new UberRide()
-                                {
-                                    Route = new Route
-                                    {
-                                        Pickup = new Location(pickupLatitude, pickupLongitude),
-                                        Dropoff = new Location(dropoffLatitude, dropoffLongitude),
-                                        Start = startLocation,
-                                        Destination = endLocation
-                                    },
-                                    PriceEstimate = priceEstimate
-                                };
-
-                                rides.Add(uberRide);
-
-                                // this.DrawRouteOnMap(this.Map, tempRoute);
-                                Console.WriteLine("Uber request completed and handled");
-                            });
+                            var handlePriceEstimateTask = getPriceEstimateTask.ContinueWith((response) => this.HandleUberPriceRequestResult(response, route, startLocation, endLocation, rides));
 
                             requests.Add(getPriceEstimateTask);
                             requests.Add(handlePriceEstimateTask);
@@ -116,6 +94,35 @@ namespace RideSidekick.Pages
 
             await Task.WhenAll(requests);
             return rides;
+        }
+
+        private void HandleUberPriceRequestResult(
+            Task<UberResponse<PriceEstimateCollection>> response, Route route, Location startLocation, Location endLocation, List<UberRide> rides)
+        {
+            string uberType = "Pool";
+
+            var priceEstimate = response.Result
+                                     .Data
+                                     .PriceEstimates
+                                     .Where(p => p.DisplayName == uberType)
+                                     .SingleOrDefault();
+
+            if (priceEstimate == null)
+            {
+                Console.WriteLine("Error getting price estimate");
+                return;
+            }
+
+            var uberRide = new UberRide()
+            {
+                Route = route,
+                PriceEstimate = priceEstimate
+            };
+
+            rides.Add(uberRide);
+
+            // this.DrawRouteOnMap(this.Map, tempRoute);
+            Console.WriteLine("Uber request completed and handled");
         }
 
         private void DrawRouteOnMap(Map map, Route route)
