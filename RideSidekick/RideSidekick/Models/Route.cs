@@ -26,7 +26,7 @@ namespace RideSidekick.Models
 
         public override string ToString()
         {
-            return $"({this.Pickup.Latitude}, {this.Pickup.Longitude}) to ({this.Dropoff.Latitude}, {this.Dropoff.Longitude})";
+            return $"({Math.Round(this.Pickup.Latitude, 3)}, {Math.Round(this.Pickup.Longitude, 3)}) to ({Math.Round(this.Dropoff.Latitude, 3)}, {Math.Round(this.Dropoff.Longitude, 3)})";
         }
     }
 }
