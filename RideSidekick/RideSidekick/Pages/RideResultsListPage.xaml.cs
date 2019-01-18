@@ -2,7 +2,6 @@
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
-using Rideshare.Uber.Sdk.Models;
 using RideSidekick.Models;
 using Xamarin.Essentials;
 using Xamarin.Forms;
@@ -12,11 +11,11 @@ using Xamarin.Forms.Xaml;
 namespace RideSidekick.Pages
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
-    public partial class RideResultsPage : ContentPage
+    public partial class RideResultsListPage : ContentPage
     {
         protected ObservableCollection<UberRow> Items { get; set; }
 
-        public RideResultsPage(IEnumerable<UberRide> rides)
+        public RideResultsListPage(IEnumerable<UberRide> rides)
         {
             InitializeComponent();
             

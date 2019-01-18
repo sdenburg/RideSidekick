@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
 using Rideshare.Uber.Sdk;
 using Rideshare.Uber.Sdk.Models;
 using RideSidekick.Configuration;
@@ -45,7 +41,17 @@ namespace RideSidekick.Pages
                 var endLocation = new Location(destinationPosition.Latitude, destinationPosition.Longitude);
                 var rides = await this.GetUberRides(currentLocation, endLocation, startWalkDistance, endWalkDistance);
 
-                await Navigation.PushAsync(new RideResultsPage(rides));
+                ContentPage resultsPage;
+                if (startWalkDistance == 0 || endWalkDistance == 0)
+                {
+                    resultsPage = new RideResultsMapPage();
+                }
+                else
+                {
+                    resultsPage = new RideResultsListPage(rides);
+                }
+
+                await Navigation.PushAsync(resultsPage);
             }
             else
             {

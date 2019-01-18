@@ -26,16 +26,22 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Pages\RideResultsListPage.xaml.cs">
+      <DependentUpon>RideResultsListPage.xaml</DependentUpon>
+    </Compile>
     <Compile Update="Pages\RideSearchPage.xaml.cs">
       <DependentUpon>RideSearchPage.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Update="Pages\RideResultsMapPage.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
     <EmbeddedResource Update="Pages\RideSearchPage.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
-    <EmbeddedResource Update="Pages\RideResultsPage.xaml">
+    <EmbeddedResource Update="Pages\RideResultsListPage.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
   </ItemGroup>

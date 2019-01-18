@@ -11,7 +11,7 @@ namespace RideSidekick.Configuration
 
         public static void LoadConfiguration()
         {
-            var assembly = IntrospectionExtensions.GetTypeInfo(typeof(RideResultsPage)).Assembly;
+            var assembly = IntrospectionExtensions.GetTypeInfo(typeof(RideResultsListPage)).Assembly;
             Stream stream = assembly.GetManifestResourceStream("RideSidekick.Configuration.UberConfiguration.json");
             using (var reader = new StreamReader(stream))
             {
