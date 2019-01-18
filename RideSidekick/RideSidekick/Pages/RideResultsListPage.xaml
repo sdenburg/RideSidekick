@@ -6,19 +6,17 @@
               ItemsSource="{Binding Items}"
               ItemTapped="Handle_ItemTapped"
               CachingStrategy="RecycleElement">
-            
-    <ListView.ItemTemplate>
-      <DataTemplate>
-        <ViewCell>
-          <StackLayout>
-            <Label Text="{Binding PriceEstimate}" 
-                   Style="{DynamicResource ListItemTextStyle}" />
-            <Label Text="{Binding Route}" 
-                   Style="{DynamicResource ListItemDetailTextStyle}"/>
-          </StackLayout>
-        </ViewCell>
-      </DataTemplate>
-    </ListView.ItemTemplate>
-    
-  </ListView>
+        <ListView.ItemTemplate>
+            <DataTemplate>
+                <ViewCell>
+                    <StackLayout>
+                        <Label Text="{Binding PriceEstimate}" 
+                               Style="{DynamicResource ListItemTextStyle}" />
+                        <Label Text="{Binding Route}" 
+                               Style="{DynamicResource ListItemDetailTextStyle}" />
+                    </StackLayout>
+                </ViewCell>
+            </DataTemplate>
+        </ListView.ItemTemplate>
+    </ListView>
 </ContentPage>

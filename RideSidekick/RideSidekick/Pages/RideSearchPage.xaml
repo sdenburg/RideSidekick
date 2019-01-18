@@ -4,11 +4,27 @@
              xmlns:maps="clr-namespace:Xamarin.Forms.Maps;assembly=Xamarin.Forms.Maps"
              x:Class="RideSidekick.Pages.RideSearchPage">
     <ContentPage.Content>
-        <StackLayout>
-            <Entry Keyboard="Text" x:Name="DestinationAddressInput" x:FieldModifier="public" Placeholder="Destination address"></Entry>
-            <Entry Keyboard="Numeric" x:Name="StartWalkDistanceInput" x:FieldModifier="public" Placeholder="Start distance" Text="0"></Entry>
-            <Entry Keyboard="Numeric" x:Name="EndWalkDistanceInput" x:FieldModifier="public" Placeholder="End ditance" Text="0.03"></Entry>
-            <Button x:Name="SubmitButton" Text="Submit" Clicked="OnSubmit"></Button>
+        <StackLayout Orientation="Vertical">
+            <Entry Keyboard="Text" x:Name="DestinationAddressInput" x:FieldModifier="public" Placeholder="Destination address" />
+            <StackLayout Orientation="Horizontal" HorizontalOptions="FillAndExpand">
+                <Label Text="Pickup Walking Distance:" />
+                <Entry Keyboard="Numeric"
+                       x:Name="StartWalkDistanceInput"
+                       x:FieldModifier="public"
+                       Placeholder="Enter distance"
+                       Text="0"
+                       HorizontalOptions="FillAndExpand" />
+            </StackLayout>
+            <StackLayout Orientation="Horizontal" HorizontalOptions="FillAndExpand">
+                <Label Text="Destination Walking Distance:" />
+                <Entry Keyboard="Numeric" 
+                       x:Name="EndWalkDistanceInput"
+                       x:FieldModifier="public" 
+                       Placeholder="Enter ditance" 
+                       Text="0.03" 
+                       HorizontalOptions="FillAndExpand" />
+            </StackLayout>
+            <Button x:Name="SubmitButton" Text="Submit" Clicked="OnSubmit" />
             <maps:Map x:Name="Map"
                       x:FieldModifier="public" 
                       IsShowingUser="True"/>
