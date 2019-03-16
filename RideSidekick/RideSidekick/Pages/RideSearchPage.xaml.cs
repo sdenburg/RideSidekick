@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Rideshare.Uber.Sdk;
@@ -18,6 +17,8 @@ namespace RideSidekick.Pages
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class RideSearchPage : ContentPage
     {
+        private const double METERS_PER_DEGREE = 111111;
+
         public RideSearchPage()
         {
             InitializeComponent();
@@ -37,10 +38,13 @@ namespace RideSidekick.Pages
             if (double.TryParse(this.StartWalkDistanceInput.Text, out double startWalkDistance) &&
                 double.TryParse(this.EndWalkDistanceInput.Text, out double endWalkDistance))
             {
+                var startWalkDistanceDegrees = startWalkDistance / METERS_PER_DEGREE;
+                var endWalkDistanceDegrees = endWalkDistance / METERS_PER_DEGREE;
+
                 var geocoder = new Geocoder();
                 var destinationPosition = (await geocoder.GetPositionsForAddressAsync(this.DestinationAddressInput.Text)).FirstOrDefault();
                 var endLocation = new Location(destinationPosition.Latitude, destinationPosition.Longitude);
-                var rides = await this.GetUberRides(currentLocation, endLocation, startWalkDistance, endWalkDistance);
+                var rides = await this.GetUberRides(currentLocation, endLocation, startWalkDistanceDegrees, endWalkDistanceDegrees);
 
                 ContentPage resultsPage;
                 if (startWalkDistance == 0 || endWalkDistance == 0)

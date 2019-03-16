@@ -7,21 +7,21 @@
         <StackLayout Orientation="Vertical">
             <Entry Keyboard="Text" x:Name="DestinationAddressInput" x:FieldModifier="public" Placeholder="Destination address" />
             <StackLayout Orientation="Horizontal" HorizontalOptions="FillAndExpand">
-                <Label Text="Pickup Walking Distance:" />
+                <Label Text="Pickup walking (meters):" />
                 <Entry Keyboard="Numeric"
                        x:Name="StartWalkDistanceInput"
                        x:FieldModifier="public"
                        Placeholder="Enter distance"
-                       Text="0"
+                       Text="1000"
                        HorizontalOptions="FillAndExpand" />
             </StackLayout>
             <StackLayout Orientation="Horizontal" HorizontalOptions="FillAndExpand">
-                <Label Text="Destination Walking Distance:" />
+                <Label Text="Destination walking (meters):" />
                 <Entry Keyboard="Numeric" 
                        x:Name="EndWalkDistanceInput"
                        x:FieldModifier="public" 
                        Placeholder="Enter ditance" 
-                       Text="0.03" 
+                       Text="1000" 
                        HorizontalOptions="FillAndExpand" />
             </StackLayout>
             <Button x:Name="SubmitButton" Text="Submit" Clicked="OnSubmit" />
