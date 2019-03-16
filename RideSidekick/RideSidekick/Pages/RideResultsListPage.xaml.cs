@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Web;
 using RideSidekick.Models;
 using Xamarin.Essentials;
 using Xamarin.Forms;
@@ -46,8 +48,20 @@ namespace RideSidekick.Pages
 
             await Task.WhenAll(pickupAddressTask, dropoffAddressTask);
 
-            string alertMessage = $"Pickup from {pickupAddressTask.Result.FirstOrDefault()} dropoff at {dropoffAddressTask.Result.FirstOrDefault()} for {uberRow.PriceEstimate}.";
-            await DisplayAlert("Ride Selected", alertMessage, "OK");
+            var pickupAddress = pickupAddressTask.Result.FirstOrDefault();
+            var dropoffAddress = dropoffAddressTask.Result.FirstOrDefault();
+
+            string alertMessage = $"Pickup from {pickupAddress} dropoff at {dropoffAddress} for {uberRow.PriceEstimate}.";
+            var openMaps = await DisplayAlert("Ride Selected", alertMessage, "Open in Maps", "Back");
+
+            if (openMaps)
+            {
+                var origin = HttpUtility.UrlPathEncode(pickupAddress);
+                var destination = HttpUtility.UrlPathEncode(dropoffAddress);
+
+                var mapsUri = new Uri($"https://www.google.com/maps/dir/?api=1&origin={origin}&destination={destination}");
+                Device.OpenUri(mapsUri);
+            }
 
             //Deselect Item
             ((ListView)sender).SelectedItem = null;
