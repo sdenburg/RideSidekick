@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Rideshare.Uber.Sdk;
@@ -148,6 +149,12 @@ namespace RideSidekick.Pages
             try
             {
                 var currentLocation = await Geolocation.GetLastKnownLocationAsync();
+                if (currentLocation == null)
+                {
+                    var locationRequest = new GeolocationRequest(GeolocationAccuracy.Medium);
+                    currentLocation = await Geolocation.GetLocationAsync(locationRequest);
+                }
+
                 var currentPosition = new Position(currentLocation.Latitude, currentLocation.Longitude);
                 var mapSpan = MapSpan.FromCenterAndRadius(currentPosition, Distance.FromMiles(1));
                 map.MoveToRegion(mapSpan);
