@@ -12,7 +12,7 @@
                        x:Name="StartWalkDistanceInput"
                        x:FieldModifier="public"
                        Placeholder="Enter distance"
-                       Text="1000"
+                       Text="0"
                        HorizontalOptions="FillAndExpand" />
             </StackLayout>
             <StackLayout Orientation="Horizontal" HorizontalOptions="FillAndExpand">
@@ -21,7 +21,7 @@
                        x:Name="EndWalkDistanceInput"
                        x:FieldModifier="public" 
                        Placeholder="Enter ditance" 
-                       Text="1000" 
+                       Text="500" 
                        HorizontalOptions="FillAndExpand" />
             </StackLayout>
             <Button x:Name="SubmitButton" Text="Submit" Clicked="OnSubmit" />

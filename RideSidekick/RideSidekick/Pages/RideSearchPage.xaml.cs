@@ -72,7 +72,7 @@ namespace RideSidekick.Pages
         {
             var uberClient = new ServerAuthenticatedUberRiderService(UberConfigurationManager.Configuration.ServerToken);
 
-            double queryDensity = 0.01;
+            double queryDensity = 0.00175;
 
             var requests = new List<Task>();
             var rides = new List<UberRide>();
