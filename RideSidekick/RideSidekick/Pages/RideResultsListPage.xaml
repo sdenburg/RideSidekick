@@ -5,15 +5,18 @@
     <ListView x:Name="RideResultsList"
               ItemsSource="{Binding Items}"
               ItemTapped="Handle_ItemTapped"
-              CachingStrategy="RecycleElement">
+              CachingStrategy="RecycleElement"
+              HasUnevenRows="True">
         <ListView.ItemTemplate>
             <DataTemplate>
                 <ViewCell>
-                    <StackLayout>
+                    <StackLayout Padding="5">
                         <Label Text="{Binding PriceEstimate}" 
-                               Style="{DynamicResource ListItemTextStyle}" />
+                               Style="{DynamicResource ListItemTextStyle}"
+                               FontSize="Medium"/>
                         <Label Text="{Binding Route}" 
-                               Style="{DynamicResource ListItemDetailTextStyle}" />
+                               Style="{DynamicResource ListItemDetailTextStyle}"
+                               FontSize="Small"/>
                     </StackLayout>
                 </ViewCell>
             </DataTemplate>

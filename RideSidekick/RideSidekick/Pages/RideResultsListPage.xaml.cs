@@ -22,15 +22,16 @@ namespace RideSidekick.Pages
             InitializeComponent();
             
             var orderedRows = rides.OrderBy(p => p.PriceEstimate.HighEstimate)
-                                    .ThenBy(p => p.Route)
-                                    .Select(p => new UberRow
-                                    {
-                                        PriceEstimate = p.PriceEstimate.Estimate,
-                                        Route = p.Route.ToString(),
-                                        Pickup = p.Route.Pickup,
-                                        Dropoff = p.Route.Dropoff
-                                    })
-                                    .ToList();
+                                   .ThenBy(p => p.PriceEstimate.LowEstimate)
+                                   .ThenBy(p => p.Route)
+                                   .Select(p => new UberRow
+                                   {
+                                       PriceEstimate = p.PriceEstimate.Estimate,
+                                       Route = p.Route.ToString(),
+                                       Pickup = p.Route.Pickup,
+                                       Dropoff = p.Route.Dropoff
+                                   })
+                                   .ToList();
 
             this.Items = new ObservableCollection<UberRow>(orderedRows);
 			RideResultsList.ItemsSource = orderedRows;
@@ -51,7 +52,7 @@ namespace RideSidekick.Pages
             var pickupAddress = pickupAddressTask.Result.FirstOrDefault();
             var dropoffAddress = dropoffAddressTask.Result.FirstOrDefault();
 
-            string alertMessage = $"Pickup from {pickupAddress} dropoff at {dropoffAddress} for {uberRow.PriceEstimate}.";
+            string alertMessage = $"Pickup from {pickupAddress} and dropoff at {dropoffAddress}";
             var openMaps = await DisplayAlert("Ride Selected", alertMessage, "Open in Maps", "Back");
 
             if (openMaps)

@@ -10,23 +10,34 @@ namespace RideSidekick.Models
         public Location Destination { get; set; }
         public Location Dropoff { get; set; }
 
+        public double GetDistanceFromStart()
+        {
+            return Location.CalculateDistance(this.Start, this.Pickup, DistanceUnits.Miles);
+        }
+
+        public double GetDistanceFromDestination()
+        {
+            return Location.CalculateDistance(this.Destination, this.Dropoff, DistanceUnits.Miles);
+        }
+
+        public double GetTotalDistance()
+        {
+            return this.GetDistanceFromStart() + this.GetDistanceFromDestination();
+        }
+
         public int CompareTo(Route other)
         {
-            var thisDistanceToPickup = Location.CalculateDistance(this.Start, this.Pickup, DistanceUnits.Miles);
-            var otherDistanceToPickup = Location.CalculateDistance(other.Start, other.Pickup, DistanceUnits.Miles);
-
-            var thisDistanceToDropoff = Location.CalculateDistance(this.Start, this.Pickup, DistanceUnits.Miles);
-            var otherDistanceToDropoff = Location.CalculateDistance(other.Start, other.Pickup, DistanceUnits.Miles);
-
-            var thisTotalWalking = thisDistanceToPickup + thisDistanceToDropoff;
-            var otherTotalWalking = otherDistanceToPickup + otherDistanceToDropoff;
-
-            return thisTotalWalking.CompareTo(otherTotalWalking);
+            return this.GetTotalDistance().CompareTo(other.GetTotalDistance());
         }
 
         public override string ToString()
         {
-            return $"({Math.Round(this.Pickup.Latitude, 3)}, {Math.Round(this.Pickup.Longitude, 3)}) to ({Math.Round(this.Dropoff.Latitude, 3)}, {Math.Round(this.Dropoff.Longitude, 3)})";
+            var precision = 2;
+            var total = Math.Round(this.GetTotalDistance(), precision);
+            var start = Math.Round(this.GetDistanceFromStart(), precision);
+            var end = Math.Round(this.GetDistanceFromDestination(), precision);
+
+            return $@"{total} total miles walking ({start} then {end})";
         }
     }
 }
