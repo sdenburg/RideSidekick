@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using RideSidekick.CustomControls;
 using RideSidekick.Extensions;
 using RideSidekick.Models;
@@ -25,6 +26,9 @@ namespace RideSidekick.Pages
             this.Map.SetDefaultView();
             this.Map.CenterOnCurrentLocation();
 
+            var averagePrice = rides.Average(r => r.PriceEstimate.HighEstimate ?? 0);
+            var standardDeviationPrice = this.CalculateStandardDeviation(rides);
+
             foreach(var ride in rides)
             {
                 Position position;
@@ -46,7 +50,7 @@ namespace RideSidekick.Pages
                     Type = PinType.Place,
                     Position = position,
                     Label = ride.PriceEstimate.Estimate,
-                    PriceColor = this.GetColor(ride)
+                    PriceColor = this.GetColor(ride, averagePrice, standardDeviationPrice)
                 };
 
                 this.Map.PricePins.Add(pin);
@@ -54,12 +58,19 @@ namespace RideSidekick.Pages
             }
         }
 
-        private PriceColor GetColor(UberRide ride)
+        private double CalculateStandardDeviation(IEnumerable<UberRide> rides)
+        {
+            var prices = rides.Select(r => r.PriceEstimate.HighEstimate ?? 0);
+            var average = prices.Average();
+            return Math.Sqrt(prices.Average(p => Math.Pow(p - average, 2)));
+        }
+
+        private PriceColor GetColor(UberRide ride, double averagePrice, double standardDeviationPrice)
         {
             var price = ride.PriceEstimate.HighEstimate;
-            if (price < 7)
+            if (price < averagePrice - standardDeviationPrice)
                 return PriceColor.Green;
-            else if (price < 15)
+            else if (price < averagePrice + standardDeviationPrice)
                 return PriceColor.Yellow;
             else
                 return PriceColor.Red;
