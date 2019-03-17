@@ -5,12 +5,12 @@ using System.Threading.Tasks;
 using Rideshare.Uber.Sdk;
 using Rideshare.Uber.Sdk.Models;
 using RideSidekick.Configuration;
+using RideSidekick.Extensions;
 using RideSidekick.Models;
 using Xamarin.Essentials;
 using Xamarin.Forms;
 using Xamarin.Forms.Maps;
 using Xamarin.Forms.Xaml;
-using Map = Xamarin.Forms.Maps.Map;
 
 namespace RideSidekick.Pages
 {
@@ -23,10 +23,8 @@ namespace RideSidekick.Pages
         {
             InitializeComponent();
 
-            var defaultMapCenter = new Position(40, -95);
-            var defaultMapSpan = MapSpan.FromCenterAndRadius(defaultMapCenter, Distance.FromMiles(100));
-            this.Map.MoveToRegion(defaultMapSpan);
-            this.CenterMapOnCurrentLocation(this.Map);
+            this.Map.SetDefaultView();
+            this.Map.CenterOnCurrentLocation();
         }
 
         public async void OnSubmit(object sender, EventArgs e)
@@ -47,9 +45,13 @@ namespace RideSidekick.Pages
                 var rides = await this.GetUberRides(currentLocation, endLocation, startWalkDistanceDegrees, endWalkDistanceDegrees);
 
                 ContentPage resultsPage;
-                if (startWalkDistance == 0 || endWalkDistance == 0)
+                if (startWalkDistance == 0)
                 {
-                    resultsPage = new RideResultsMapPage();
+                    resultsPage = new RideResultsMapPage(rides, RideResultsMapPage.SingleLocation.Start);
+                }
+                else if (endWalkDistance == 0)
+                {
+                    resultsPage = new RideResultsMapPage(rides, RideResultsMapPage.SingleLocation.End);
                 }
                 else
                 {
@@ -108,7 +110,11 @@ namespace RideSidekick.Pages
         }
 
         private void HandleUberPriceRequestResult(
-            Task<UberResponse<PriceEstimateCollection>> response, Route route, Location startLocation, Location endLocation, List<UberRide> rides)
+            Task<UberResponse<PriceEstimateCollection>> response, 
+            Route route, 
+            Location startLocation, 
+            Location endLocation, 
+            List<UberRide> rides)
         {
             string uberType = "Pool";
 
@@ -131,53 +137,8 @@ namespace RideSidekick.Pages
             };
 
             rides.Add(uberRide);
-
-            // this.DrawRouteOnMap(this.Map, tempRoute);
+            
             Console.WriteLine("Uber request completed and handled");
-        }
-
-        private void DrawRouteOnMap(Map map, Route route)
-        {
-            var pin = new Pin
-            {
-                Type = PinType.Place,
-                Position = new Position(route.Dropoff.Latitude, route.Dropoff.Longitude),
-                Label = "Price",
-                Address = "Details"
-            };
-            // this.Map.Pins.Add(pin);
-        }
-
-        private async void CenterMapOnCurrentLocation(Map map)
-        {
-            try
-            {
-                var currentLocation = await Geolocation.GetLastKnownLocationAsync();
-                if (currentLocation == null)
-                {
-                    var locationRequest = new GeolocationRequest(GeolocationAccuracy.Medium);
-                    currentLocation = await Geolocation.GetLocationAsync(locationRequest);
-                }
-
-                var currentPosition = new Position(currentLocation.Latitude, currentLocation.Longitude);
-                var mapSpan = MapSpan.FromCenterAndRadius(currentPosition, Distance.FromMiles(1));
-                map.MoveToRegion(mapSpan);
-            }
-            catch (FeatureNotSupportedException fnsEx)
-            {
-                // Handle not supported on device exception
-                return;
-            }
-            catch (PermissionException pEx)
-            {
-                // Handle permission exception
-                return;
-            }
-            catch (Exception ex)
-            {
-                // Unable to get location
-                return;
-            }
         }
     }
 }
